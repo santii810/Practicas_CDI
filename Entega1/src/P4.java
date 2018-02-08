@@ -7,13 +7,12 @@ public class P4 {
 			System.out.println("Error in arguments");
 		} else {
 			int numHilos = Integer.parseInt(args[0]);
-			Runnable[] hilosR = new HiloR[numHilos];
+			
+			Thread[] hilosR = new Thread[numHilos];
 
 			for (int i = 0; i < numHilos; i++) {
-				hilosR[i] = new HiloR("Thread " + (i + 1));
-			}
-
-			for (int i = 0; i < hilosR.length; i++) {
+				String nombreHilo = "Thread " + (i + 1);
+				hilosR[i] = new Thread(new HiloRun(nombreHilo), nombreHilo);
 				new Thread(hilosR[i]).start();
 			}
 		}
