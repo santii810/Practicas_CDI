@@ -19,6 +19,8 @@ public class mainRunnable {
 			}
 
 		}
+		
+		System.out.println("Program of exercise P4 has terminated");
 
 	}
 
