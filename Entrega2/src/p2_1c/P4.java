@@ -1,3 +1,4 @@
+package p2_1c;
 import java.util.ArrayList;
 
 public class P4 {
@@ -13,11 +14,13 @@ public class P4 {
 		
 		
 		for (MiHilo miHilo : threadList) {
-			try {
-				miHilo.join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			while(miHilo.isAlive()){
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		System.out.println("Program of exercise P4 has terminated");

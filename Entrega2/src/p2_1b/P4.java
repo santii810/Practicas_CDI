@@ -1,3 +1,4 @@
+package p2_1b;
 import java.util.ArrayList;
 
 public class P4 {
@@ -9,16 +10,6 @@ public class P4 {
 			String nombreHilo = "Thread number " + (i+1);
 			threadList.add(new MiHilo(nombreHilo));
 			new Thread(threadList.get(i)).start();
-		}
-		
-		
-		for (MiHilo miHilo : threadList) {
-			try {
-				miHilo.join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 		System.out.println("Program of exercise P4 has terminated");
 	}
