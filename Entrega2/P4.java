@@ -1,25 +1,24 @@
 /*
- * b)	¿Cuál es el resultado de tu código? ¿En qué orden se imprimen los hilos?
-El resultado de la ejecución no coincide al hacer múltiples pruebas, habitualmente 
-finalizan unos cuantos hilos antes de que el programa principal finalice y otros después.
-Los hilos no finalizan secuencialmente pero sí con un cierto orden, es decir, es muy 
+ * b)	Â¿CuÃ¡l es el resultado de tu cÃ³digo? Â¿En quÃ© orden se imprimen los hilos?
+El resultado de la ejecuciÃ³n no coincide al hacer mÃºltiples pruebas, habitualmente 
+finalizan unos cuantos hilos antes de que el programa principal finalice y otros despuÃ©s.
+Los hilos no finalizan secuencialmente pero sÃ­ con un cierto orden, es decir, es muy 
 probable que el hilo numero 1 finalice antes que el hilo numero 10.
 
  * 
  * 
  * 
  * 
- * d)
+ * d) ) Â¿Funciona exactamente igual? Â¿Afecta la ejecuciÃ³n de los subprocesos en ejecuciÃ³n?
  Aparentemente el resultado de las 2 formas es identico, sin embargo si lo haces con isAlive()
   es posible que el bucle de comprobacion compruebe hilos que aun no han empezado por lo que 
   no los comprobaria 
+  No afecta a los subprocesos ya que el hilo que se pausa es el main
  
  * 
  * 
  * 
  * */
-
-package p2_1c;
 
 import java.util.ArrayList;
 
