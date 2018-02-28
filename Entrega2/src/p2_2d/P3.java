@@ -1,5 +1,5 @@
 
-//package p2_2d;
+package p2_2d;
 
 import java.util.ArrayList;
 
