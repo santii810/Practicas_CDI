@@ -1,3 +1,4 @@
+package P4_1c;
 
 /*
  * 
@@ -9,18 +10,18 @@
 
 import java.util.ArrayList;
 
-public class P4 {
+public class MiProblema {
 	final static int NUMBER_OF_THREADS = 50;
 
 	public static void main(String[] args) {
-		ArrayList<MiHilo> threadList = new ArrayList<MiHilo>(NUMBER_OF_THREADS);
+		ArrayList<MiThreadApartadoC> threadList = new ArrayList<MiThreadApartadoC>(NUMBER_OF_THREADS);
 		for (int i = 0; i < NUMBER_OF_THREADS; i++) {
 			String nombreHilo = "Thread number " + (i + 1);
-			threadList.add(new MiHilo(nombreHilo));
+			threadList.add(new MiThreadApartadoC(nombreHilo));
 			threadList.get(i).start();
 		}
 
-		for (MiHilo miHilo : threadList) {
+		for (MiThreadApartadoC miHilo : threadList) {
 			try {
 				miHilo.join();
 			} catch (InterruptedException e) {
@@ -30,11 +31,11 @@ public class P4 {
 	}
 }
 
-class MiHilo extends Thread {
+class MiThreadApartadoC extends Thread {
 
 	private ThreadLocal<Integer> miSuma;
 
-	public MiHilo(String nombreHilo) {
+	public MiThreadApartadoC(String nombreHilo) {
 		super(nombreHilo);
 		miSuma = new ThreadLocal<>();
 	}
@@ -45,8 +46,7 @@ class MiHilo extends Thread {
 		for (int i = 0; i <= 100; i++) {
 			miSuma.set(miSuma.get() + i);
 		}
-		System.out
-				.println("Bye, this was " + currentThread().getName()
-						+ " and finish with sum = " + miSuma.get().toString());
+		System.out.println(
+				"Bye, this was " + currentThread().getName() + " and finish with sum = " + miSuma.get().toString());
 	}
 }
