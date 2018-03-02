@@ -1,143 +1,110 @@
 import java.util.ArrayList;
 
 public class MiProblema {
-	final static int NUMBER_OF_THREADS = 50;
-	// APARTADO B
-	// public static void main(String[] args) {
-	// ArrayList<MiThreadApartadoB> threadList = new
-	// ArrayList<MiThreadApartadoB>(NUMBER_OF_THREADS);
-	// for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-	// String nombreHilo = "Thread number " + (i + 1);
-	// threadList.add(new MiThreadApartadoB(nombreHilo));
-	// threadList.get(i).start();
-	// }
-	//
-	// for (MiThreadApartadoB miHilo : threadList) {
-	// try {
-	// miHilo.join();
-	// } catch (InterruptedException e) {
-	// }
-	// }
-	// System.out.println("Program of exercise P4 has terminated");
-	// }
-//}
- 
-	// APARTADO C
-	// public static void main(String[] args) {
-	// ArrayList<MiThreadApartadoC> threadList = new
-	// ArrayList<MiThreadApartadoC>(NUMBER_OF_THREADS);
-	// for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-	// String nombreHilo = "Thread number " + (i + 1);
-	// threadList.add(new MiThreadApartadoC(nombreHilo));
-	// threadList.get(i).start();
-	// }
-	//
-	// for (MiThreadApartadoC miHilo : threadList) {
-	// try {
-	// miHilo.join();
-	// } catch (InterruptedException e) {
-	// }
-	// }
-	// System.out.println("Program of exercise P4 has terminated");
-	// }
-	
+
 	public static void main(String[] args) {
-		ArrayList<MiThread> threadList = new ArrayList<MiThread>(NUMBER_OF_THREADS);
-		for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-			String nombreHilo = "Thread number " + (i + 1);
-			threadList.add(new MiThread(nombreHilo));
-			threadList.get(i).start();
+
+		if (args.length != 3) {
+			System.out.println("Numero de argumentos incorrecto");
+			System.exit(1);
 		}
+		int width = Integer.parseInt(args[0]);
+		int height = Integer.parseInt(args[1]);
+		int numThreads = Integer.parseInt(args[2]);
+		MiMatriz matriz = new MiMatriz(width, height);
+//		matriz.imprimir();
+		System.out.println();
+		System.out.println();
+		matriz.filtroMediano(7, 1, 1);
+		matriz.imprimir();
 
-		int randomTime = (int) (Math.random() * (NUMBER_OF_THREADS * 2));
-		for (MiThread miThread : threadList) {
-			try {
-				Thread.sleep(randomTime);
-			} catch (InterruptedException e) {
-			}
-			miThread.interrupt();
-		}
-
-		for (MiThread miHilo : threadList) {
-			try {
-				miHilo.join();
-			} catch (InterruptedException e) {
-			}
-		}
-		System.out.println("Program of exercise P4 has terminated");
-	}
-}
-
-class MiThreadApartadoB extends Thread {
-
-	static private Integer miSuma = 0;
-
-	public MiThreadApartadoB(String nombreHilo) {
-		super(nombreHilo);
+		// ArrayList<MiThread> threadList = new ArrayList<>();
+		// for (int i = 0; i < numThreads; i++) {
+		// threadList.add(new MiThread("Thread number " + i, original, destino,
+		// numThreads));
+		// }
+		//
+		// for (MiThread miHilo : threadList) {
+		// try {
+		// miHilo.join();
+		// } catch (InterruptedException e) {
+		// }
+		// }
+		// System.out.println("Program of exercise P4 has terminated");
 	}
 
-	@Override
-	public void run() {
-		for (int i = 0; i <= 100; i++) {
-			miSuma += i;
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-			}
-		}
-		System.out
-				.println("Bye, this was " + currentThread().getName() + " and finish with sum = " + miSuma.toString());
-	}
-}
-
-class MiThreadApartadoC extends Thread {
-
-	private ThreadLocal<Integer> miSuma;
-
-	public MiThreadApartadoC(String nombreHilo) {
-		super(nombreHilo);
-		miSuma = new ThreadLocal<>();
-	}
-
-	@Override
-	public void run() {
-		miSuma.set(0);
-		for (int i = 0; i <= 100; i++) {
-			miSuma.set(miSuma.get() + i);
-		}
-		System.out.println(
-				"Bye, this was " + currentThread().getName() + " and finish with sum = " + miSuma.get().toString());
-	}
 }
 
 class MiThread extends Thread {
-	boolean negative = true;
-	double pi = 0.0;
+	int[][] original;
+	int[][] destino;
+	int numThreads;
 
-	public MiThread(String nombreHilo) {
+	public MiThread(String nombreHilo, int[][] original, int[][] destino, int numThreads) {
 		super(nombreHilo);
+		this.original = original;
+		this.destino = destino;
+		this.numThreads = numThreads;
 	}
 
 	@Override
 	public void run() {
-		try {
-			for (int i = 3; i < 100000; i += 2) {
-				Thread.sleep(1);
-				if (negative)
-					pi -= 1.0 / i;
-				else
-					pi += 1.0 / i;
-				negative = !negative;
+
+	}
+}
+
+class MiMatriz {
+	static int[][] original;
+	static int[][] destino;
+
+	public MiMatriz(int width, int height) {
+		original = new int[width][height];
+		destino = new int[width][height];
+		rellenarMatriz(width, height, original);
+	}
+
+	private static void rellenarMatriz(int width, int height, int[][] original) {
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				original[i][j] = (int) (Math.random() * 10);
 			}
-
-			pi += 1.0;
-			pi *= 4.0;
-		} catch (InterruptedException e) {
-		} finally {
-			pi += 1.0;
-			pi *= 4.0;
-			System.out.println("Bye, this was " + currentThread().getName() + " and finish with \t sum = " + pi);
 		}
-	
+	}
 
-}}
+	public static void imprimir() {
+		for (int i = 0; i < original.length; i++) {
+			for (int j = 0; j < original[i].length; j++) {
+				System.out.print(original[i][j] + "\t");
+			}
+			System.out.println();
+		}
+		System.out.println();
+		System.out.println();
+		for (int i = 0; i < original.length; i++) {
+			for (int j = 0; j < original[i].length; j++) {
+				System.out.print(destino[i][j] + "\t");
+			}
+			System.out.println();
+		}
+	}
+
+	public static void filtroMediano(int x, int y, int f) {
+		double fraccion = 1 / Math.pow((2 * f + 1), 2);
+		int acum = 0, reflejoX = 0, reflejoY = 0;
+		for (int i = x - f; i <= x + f; i++) {
+			for (int j = y - f; j <= y + f; j++) {
+				reflejoX = i;
+				reflejoY = j;
+				if (x >= (original.length - 1))
+					reflejoX = i - f * (i - x);
+//				if (y >= (original[Math.abs(reflejoX)].length - 1))
+//					reflejoY = y - (j - y);
+				System.out.println("y " + reflejoY + "\t " + y + "-(" +j + "-" + y +") "  );
+				acum += original[Math.abs(reflejoX)][Math.abs(reflejoY)];
+			}
+		}
+		destino[x][y] = (int) (acum * fraccion);
+		System.out.println();
+		System.out.println();
+	}
+}
