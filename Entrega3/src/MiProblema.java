@@ -12,11 +12,12 @@ public class MiProblema {
 		int height = Integer.parseInt(args[1]);
 		int numThreads = Integer.parseInt(args[2]);
 		MiMatriz matriz = new MiMatriz(width, height);
-//		matriz.imprimir();
-		System.out.println();
-		System.out.println();
-		matriz.filtroMediano(7, 1, 1);
-		matriz.imprimir();
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				MiMatriz.filtroMediano(i, j, 3);
+			}
+		}
+		MiMatriz.imprimir();
 
 		// ArrayList<MiThread> threadList = new ArrayList<>();
 		// for (int i = 0; i < numThreads; i++) {
@@ -95,16 +96,13 @@ class MiMatriz {
 			for (int j = y - f; j <= y + f; j++) {
 				reflejoX = i;
 				reflejoY = j;
-				if (x >= (original.length - 1))
-					reflejoX = i - f * (i - x);
-//				if (y >= (original[Math.abs(reflejoX)].length - 1))
-//					reflejoY = y - (j - y);
-				System.out.println("y " + reflejoY + "\t " + y + "-(" +j + "-" + y +") "  );
-				acum += original[Math.abs(reflejoX)][Math.abs(reflejoY)];
+				if (i > (original.length - 1) || i < 0)
+					reflejoX = 2 * x - i;
+				if (j > (original[Math.abs(reflejoX)].length - 1) || j < 0)
+					reflejoY = 2 * y - j;
+				acum += original[reflejoX][reflejoY];
 			}
 		}
 		destino[x][y] = (int) (acum * fraccion);
-		System.out.println();
-		System.out.println();
 	}
 }
