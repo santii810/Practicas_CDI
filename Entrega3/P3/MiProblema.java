@@ -19,7 +19,7 @@ public class MiProblema {
 		MiMatriz matriz = new MiMatriz(filas, columnas);
 		ArrayList<MiThread> misHilos = new ArrayList<>();
 
-		long startTime = System.nanoTime();
+		long startTime = System.currentTimeMillis();
 		MiMatriz.distribuirColumnas(misHilos, numThreads, f);
 
 		for (MiThread miThread : misHilos) {
@@ -33,7 +33,7 @@ public class MiProblema {
 		}
 		// MiMatriz.imprimir();
 		// System.out.println("Program of exercise P4 has terminated");
-		long endTime = (System.nanoTime() - startTime) / 1000;
+		long endTime = System.currentTimeMillis() - startTime;
 		System.out.println(filas + "\t" + columnas + "\t" +numThreads + "\t" + endTime);
 	}
 }
