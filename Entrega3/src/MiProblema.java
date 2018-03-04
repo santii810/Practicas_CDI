@@ -34,7 +34,7 @@ public class MiProblema {
 		// MiMatriz.imprimir();
 		// System.out.println("Program of exercise P4 has terminated");
 		long endTime = System.currentTimeMillis() - startTime;
-		System.out.println(filas + "\t" + columnas + "\t" +numThreads + "\t" + endTime);
+		System.out.println(filas + "\t" + columnas + "\t" + f + "\t" +numThreads + "\t" + endTime);
 	}
 }
 
