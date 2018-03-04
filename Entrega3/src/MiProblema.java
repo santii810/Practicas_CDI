@@ -98,13 +98,12 @@ class MiMatriz {
 	public static void distribuirColumnas(ArrayList<MiThread> misHilos, int numThreads, int f) {
 		int siguienteHilo = 0;
 		// Instancio todos los hilos
-		for (int i = 0; i < original.length; i++) {
+		for (int i = 0; i < numThreads; i++) {
 			misHilos.add(new MiThread("Thread number " + i, f));
 		}
 
 		// Estrategia de dividir por columnas
 		for (int i = 0; i < original[0].length; i++) {
-			
 			misHilos.get(siguienteHilo++ % numThreads).columnas.add(i);
 		}
 	}
