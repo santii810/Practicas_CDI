@@ -34,7 +34,7 @@ public class MiProblema {
 		// MiMatriz.imprimir();
 		// System.out.println("Program of exercise P4 has terminated");
 		long endTime = System.currentTimeMillis() - startTime;
-		System.out.println(filas + "\t" + columnas + "\t" +numThreads + "\t" + endTime);
+		System.out.println(filas + "\t" + columnas + "\t" + f + "\t" +numThreads + "\t" + endTime);
 	}
 }
 
@@ -98,13 +98,12 @@ class MiMatriz {
 	public static void distribuirColumnas(ArrayList<MiThread> misHilos, int numThreads, int f) {
 		int siguienteHilo = 0;
 		// Instancio todos los hilos
-		for (int i = 0; i < original.length; i++) {
+		for (int i = 0; i < numThreads; i++) {
 			misHilos.add(new MiThread("Thread number " + i, f));
 		}
 
 		// Estrategia de dividir por columnas
 		for (int i = 0; i < original[0].length; i++) {
-			
 			misHilos.get(siguienteHilo++ % numThreads).columnas.add(i);
 		}
 	}
