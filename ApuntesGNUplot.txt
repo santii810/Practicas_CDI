@@ -1,0 +1,10 @@
+gnuplot
+
+set logscale x 2  //configurar grafica para que el eje x crezca logaritmicamente
+
+plot fichero.dat w l lw 2   // para hacer lineas gruesas 
+
+
+//Imprimir varias lineas
+plot 'windows - 7700.dat' w l lw 2, 'windows - 6700HQ.dat' w l lw 2,  'linux - 4700HQ.dat' w l lw 2
+
