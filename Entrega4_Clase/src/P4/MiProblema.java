@@ -1,3 +1,4 @@
+package P4;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,7 +13,6 @@ public class MiProblema {
 		for (int i = 0; i < NUM_HILOS; i++) {
 			misHilos.add(new MiThread("Hilo " + i, cont));
 		}
-
 		long startTime = System.currentTimeMillis();
 
 		for (MiThread miThread : misHilos) {

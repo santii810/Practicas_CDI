@@ -3,14 +3,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MiProblema {
 
-	private static final int NUM_HILOS = 10;
-
 	public static void main(String[] args) {
 
+		if (args.length != 2) {
+			System.err.println("Numero de argumentos incorrecto");
+			System.exit(1);
+		}
+
+		int numAumentos = Integer.parseInt(args[0]);
+		int numThreads = Integer.parseInt(args[1]);
+		
 		ArrayList<MiThread> misHilos = new ArrayList<>();
 		Contador cont = new Contador(0);
-		for (int i = 0; i < NUM_HILOS; i++) {
-			misHilos.add(new MiThread("Hilo " + i, cont));
+		for (int i = 0; i < numThreads; i++) {
+			misHilos.add(new MiThread("Hilo " + i, cont, numAumentos));
 		}
 		long startTime = System.currentTimeMillis();
 
@@ -33,30 +39,24 @@ public class MiProblema {
 class MiThread extends Thread {
 
 	private Contador cont;
+	int numAumentos;
 
-	public MiThread(String nombreHilo, Contador cont) {
+	public MiThread(String nombreHilo, Contador cont, int numAumentos) {
 		super(nombreHilo);
 		this.cont = cont;
+		this.numAumentos = numAumentos;
 	}
 
 	@Override
 	public void run() {
-		int num1 = (int) (Math.random() * 10);
-		// synchronized (cont) {
-		for (int i = 0; i <= num1; i++) {
+		for (int i = 0; i <= numAumentos; i++) {
 			int inicial = cont.get();
 			cont.incrementar(1);
 			int finalValue = cont.get();
 			System.out.println("Hi, i'm " + currentThread().getName() + " the acum value is " + inicial
 					+ " and I increment to " + finalValue);
-
-			try {
-				Thread.sleep((long) (Math.random() * 100));
-			} catch (InterruptedException e) {
-			}
 		}
 	}
-	// }
 }
 
 class Contador {
@@ -68,20 +68,20 @@ class Contador {
 	}
 
 	public int incrementar(int n) {
-
 		for (int i = 0; i <= n; i++) {
-			acum.incrementAndGet();
 			try {
-				Thread.sleep((long) (Math.random() * 1000));
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			acum.incrementAndGet();
 		}
 		return acum.get();
 	}
 
 	public int get() {
 		return acum.get();
-
 	}
 
 	@Override
