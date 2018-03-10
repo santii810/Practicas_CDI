@@ -1,31 +1,24 @@
+import java.lang.management.LockInfo;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MiProblema {
 
+	private static final int NUM_HILOS = 10;
+
 	public static void main(String[] args) {
 
-		if (args.length != 1) {
-			System.out.println("Numero de argumentos incorrecto");
-			System.exit(1);
-		}
-		int numThreads = Integer.parseInt(args[0]);
-
 		ArrayList<MiThread> misHilos = new ArrayList<>();
-
+		Contador cont = new Contador(0);
+		for (int i = 0; i < NUM_HILOS; i++) {
+			misHilos.add(new MiThread("Hilo " + i, cont));
+		}
 		long startTime = System.currentTimeMillis();
 
-		for (int i = 0; i < numThreads; i++) {
-			misHilos.add(new MiThread("Hilo " + i));
-		}
 		for (MiThread miThread : misHilos) {
 			miThread.start();
-		}
-
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 		for (MiThread miThread : misHilos) {
 			try {
@@ -33,54 +26,67 @@ public class MiProblema {
 			} catch (InterruptedException e) {
 			}
 		}
-
 		long endTime = System.currentTimeMillis() - startTime;
+		System.out.println("Program of P4 has termitated");
 
 	}
+
 }
 
 class MiThread extends Thread {
 
-	static Contador contador;
+	private Contador cont;
+	private ReentrantLock lock;
 
-	public MiThread(String nombreHilo) {
+	public MiThread(String nombreHilo, Contador cont) {
 		super(nombreHilo);
-		contador = new Contador();
+		this.cont = cont;
+		lock = new ReentrantLock();
 	}
 
 	@Override
 	public void run() {
-		int veces = (int) (Math.random() * 20);
-		for (int i = 0; i < veces; i++) {
-			int num = (int) (Math.random() * 20);
-			contador.incrementar(num);
+		int num1 = (int) (Math.random() * 100);
+		// synchronized (cont) {
+		try {
+			lock.lock();
+			for (int i = 0; i <= num1; i++) {
+				int inicial = cont.get();
+				cont.incrementar(1);
+				int finalValue = cont.get();
+				System.out.println("Hi, i'm " + currentThread().getName() + " the acum value is " + inicial
+						+ " and I increment to " + finalValue);
+			}
+		} finally {
+			lock.unlock();
 		}
-		System.out.println(contador);
+		// }
 	}
 }
 
 class Contador {
-	int acum;
+	// private int acum;
+	private AtomicInteger acum;
 
-	public Contador() {
-		this.acum = 0;
+	public Contador(int inicial) {
+		acum = new AtomicInteger(inicial);
 	}
 
-	synchronized public int incrementar(int n) {
-		for (int i = 0; i < n; i++) {
-			acum++;
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+	public int incrementar(int n) {
+
+		for (int i = 0; i <= n; i++) {
+			acum.incrementAndGet();
 		}
-		return acum;
+		return acum.get();
+	}
+
+	public int get() {
+		return acum.get();
+
 	}
 
 	@Override
 	public String toString() {
-		return Integer.toString(acum);
+		return Integer.toString(acum.get());
 	}
-
 }

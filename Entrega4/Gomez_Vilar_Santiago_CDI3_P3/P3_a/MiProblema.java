@@ -1,5 +1,8 @@
+import java.lang.management.LockInfo;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MiProblema {
 
@@ -33,30 +36,32 @@ public class MiProblema {
 class MiThread extends Thread {
 
 	private Contador cont;
+	private ReentrantLock lock;
 
 	public MiThread(String nombreHilo, Contador cont) {
 		super(nombreHilo);
 		this.cont = cont;
+		lock = new ReentrantLock();
 	}
 
 	@Override
 	public void run() {
-		int num1 = (int) (Math.random() * 10);
+		int num1 = (int) (Math.random() * 100);
 		// synchronized (cont) {
-		for (int i = 0; i <= num1; i++) {
-			int inicial = cont.get();
-			cont.incrementar(1);
-			int finalValue = cont.get();
-			System.out.println("Hi, i'm " + currentThread().getName() + " the acum value is " + inicial
-					+ " and I increment to " + finalValue);
-
-			try {
-				Thread.sleep((long) (Math.random() * 100));
-			} catch (InterruptedException e) {
+		try {
+			lock.lock();
+			for (int i = 0; i <= num1; i++) {
+				int inicial = cont.get();
+				cont.incrementar(1);
+				int finalValue = cont.get();
+				System.out.println("Hi, i'm " + currentThread().getName() + " the acum value is " + inicial
+						+ " and I increment to " + finalValue);
 			}
+		} finally {
+			lock.unlock();
 		}
+		// }
 	}
-	// }
 }
 
 class Contador {
@@ -71,10 +76,6 @@ class Contador {
 
 		for (int i = 0; i <= n; i++) {
 			acum.incrementAndGet();
-			try {
-				Thread.sleep((long) (Math.random() * 1000));
-			} catch (InterruptedException e) {
-			}
 		}
 		return acum.get();
 	}
