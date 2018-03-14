@@ -42,7 +42,7 @@ class ClaseA {
 		try {
 			System.out.println("Ejecutando " + Thread.currentThread().getName());
 			Thread.sleep(espera);
-			System.out.println(Thread.currentThread().getName() + "acabando de ejecutarse.");
+			System.out.println(Thread.currentThread().getName() + " acabando de ejecutarse.");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
