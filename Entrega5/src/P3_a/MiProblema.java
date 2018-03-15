@@ -1,3 +1,5 @@
+package P3_a;
+
 
 import java.util.ArrayList;
 
@@ -9,14 +11,12 @@ public class MiProblema {
 		}
 		int numThreads = Integer.parseInt(args[0]);
 		int ejecuciones = Integer.parseInt(args[1]);
-		String[] colores = new String[] { "rojo", "negro" };
 
 		ClaseA objA = new ClaseA(10, ejecuciones);
 		ArrayList<Thread> misHilos = new ArrayList<>();
 		for (int i = 0; i < numThreads; i++) {
-			String nombreHilo = Integer.toString(i + 1);
-			String color = colores[(int) (Math.random()*2)];
-			misHilos.add(new Thread(new MiThread(objA, color), nombreHilo));
+			String nombreHilo = Integer.toString(i+1);
+			misHilos.add(new Thread(new MiThread(objA), nombreHilo));
 		}
 
 		for (Thread thread : misHilos) {
@@ -38,22 +38,20 @@ public class MiProblema {
 class ClaseA {
 	private int espera;
 	public int nActual;
-	public String lastColor;
+	public int nHUltimo;
 
 	public ClaseA(int espera, int nActual) {
 		this.espera = espera;
 		this.nActual = nActual;
-		lastColor = "";
 	}
 
-	public void EnterAndWait(String color) {
+	public void EnterAndWait() {
 		try {
-			lastColor = color;
-			System.out.println("Ejecutando hilo " + Thread.currentThread().getName() + " de color "
-					+ color);
+			nHUltimo = Integer.parseInt(Thread.currentThread().getName());
+			System.out.println("Ejecutando hilo " + Thread.currentThread().getName());
 			Thread.sleep(espera);
-			System.out.println("Hilo " + Thread.currentThread().getName() + " acabando de ejecutarse. Quedan "
-					+ --nActual + " ejecuciones.");
+			System.out.println("Hilo " + Thread.currentThread().getName() + " acabando de ejecutarse. Quedan " + --nActual
+					+ " ejecuciones.");
 
 		} catch (InterruptedException e) {
 		}
@@ -63,21 +61,19 @@ class ClaseA {
 class MiThread implements Runnable {
 
 	ClaseA objA;
-	String color;
 
-	public MiThread(ClaseA objA, String color) {
+	public MiThread(ClaseA objA) {
 		this.objA = objA;
-		this.color = color;
 	}
 
 	@Override
 	public void run() {
 		synchronized (objA) {
 			while (objA.nActual > 0) {
-				if (!objA.lastColor.equals(this.color)) {
-					objA.EnterAndWait(this.color);
+				if (!Thread.currentThread().getName().equals(Integer.toString(objA.nHUltimo))) {
+					objA.EnterAndWait();
 					objA.notifyAll();
-				} else {
+				}else {
 					try {
 						objA.wait();
 					} catch (InterruptedException e) {
