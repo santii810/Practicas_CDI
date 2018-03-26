@@ -1,6 +1,9 @@
+package P3_b;
+
+
 import java.util.ArrayList;
 
-public class MiProblema {
+public class ModoFuerzaBruta {
 	public static void main(String args[]) {
 		if (args.length != 2) {
 			System.out.println("Numero de argumentos incorrecto");
@@ -9,13 +12,14 @@ public class MiProblema {
 		int numThreads = Integer.parseInt(args[0]);
 		int ejecuciones = Integer.parseInt(args[1]);
 
-		ClaseA objA = new ClaseA(10, ejecuciones);
+		ClaseA_FB objA = new ClaseA_FB(2, ejecuciones);
 		ArrayList<Thread> misHilos = new ArrayList<>();
 		for (int i = 0; i < numThreads; i++) {
-			String nombreHilo = Integer.toString(i+1);
-			misHilos.add(new Thread(new MiThread(objA), nombreHilo));
+			String nombreHilo = Integer.toString(i + 1);
+			misHilos.add(new Thread(new MiThread_FB(objA), nombreHilo));
 		}
 
+		long startTime = System.currentTimeMillis();
 		for (Thread thread : misHilos) {
 			thread.start();
 		}
@@ -26,18 +30,18 @@ public class MiProblema {
 			}
 		}
 
-		System.out.println("Program of exercise P4 has terminated");
-
+		long endTime = System.currentTimeMillis() - startTime;
+		System.out.println(ejecuciones + "\t" + endTime);
 	}
 
 }
 
-class ClaseA {
+class ClaseA_FB {
 	private int espera;
 	public int nActual;
 	public int nHUltimo;
 
-	public ClaseA(int espera, int nActual) {
+	public ClaseA_FB(int espera, int nActual) {
 		this.espera = espera;
 		this.nActual = nActual;
 	}
@@ -45,21 +49,18 @@ class ClaseA {
 	public void EnterAndWait() {
 		try {
 			nHUltimo = Integer.parseInt(Thread.currentThread().getName());
-			System.out.println("Ejecutando hilo " + Thread.currentThread().getName());
 			Thread.sleep(espera);
-			System.out.println("Hilo " + Thread.currentThread().getName() + " acabando de ejecutarse. Quedan " + --nActual
-					+ " ejecuciones.");
-
+			--nActual;
 		} catch (InterruptedException e) {
 		}
 	}
 }
 
-class MiThread implements Runnable {
+class MiThread_FB implements Runnable {
 
-	ClaseA objA;
+	ClaseA_FB objA;
 
-	public MiThread(ClaseA objA) {
+	public MiThread_FB(ClaseA_FB objA) {
 		this.objA = objA;
 	}
 
@@ -70,7 +71,7 @@ class MiThread implements Runnable {
 				if (!Thread.currentThread().getName().equals(Integer.toString(objA.nHUltimo))) {
 					objA.EnterAndWait();
 					objA.notifyAll();
-				}else {
+				} else {
 					try {
 						objA.wait();
 					} catch (InterruptedException e) {

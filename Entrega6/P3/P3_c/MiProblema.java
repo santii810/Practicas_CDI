@@ -1,27 +1,30 @@
-package P4;
-
 
 import java.util.ArrayList;
 
 public class MiProblema {
 
-	static final int NUM_HILOS = 3;
 
 	public static void main(String args[]) {
+		if (args.length != 1) {
+			System.out.println("Numero de argumentos incorrecto");
+			System.exit(1);
+		}
+		int numThreads = Integer.parseInt(args[0]);
 		
-		ClaseA objA = new ClaseA(100);
+		ClaseA objA = new ClaseA(10);
 		ArrayList<MiThread> misRunnable = new ArrayList<>();
 		ArrayList<Thread> misThread = new ArrayList<>();
 
-		for (int i = 0; i < NUM_HILOS; i++) {
+		for (int i = 0; i < numThreads; i++) {
 			misRunnable.add(new MiThread(objA));
 		}
 
-		misRunnable.get(0).setComp(misRunnable.get(1));
-		misRunnable.get(1).setComp(misRunnable.get(0));
-	
+		misRunnable.get(misRunnable.size() - 1).setComp(misRunnable.get(0));
+		for (int i = 0; i < numThreads-1; i++) {
+			misRunnable.get(i).setComp(misRunnable.get(i + 1));
+		}
 		
-		for (int i = 0; i < NUM_HILOS; i++) {
+		for (int i = 0; i < numThreads; i++) {
 			misThread.add(new Thread(misRunnable.get(i), "Hilo " + (i + 1)));
 		}
 

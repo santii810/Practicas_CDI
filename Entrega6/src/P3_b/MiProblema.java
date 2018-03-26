@@ -1,3 +1,7 @@
+package P3_b;
+
+
+
 import java.util.ArrayList;
 
 public class MiProblema {

@@ -35,6 +35,7 @@ public class MiProblema {
 		}
 
 		long endTime = System.currentTimeMillis() - startTime;
+		System.out.println(numThreads + "\t" + endTime);
 
 	}
 }
