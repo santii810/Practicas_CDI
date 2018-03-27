@@ -10,7 +10,7 @@ public class ModoExplicito {
 		int numThreads = Integer.parseInt(args[0]);
 		int ejecuciones = Integer.parseInt(args[1]);
 
-		ClaseAExplicita objA = new ClaseAExplicita(2, ejecuciones, numThreads);
+		ClaseAExplicita objA = new ClaseAExplicita(0, ejecuciones, numThreads);
 		ArrayList<MiThreadExplicito> misRunnable = new ArrayList<>();
 		ArrayList<Thread> misThread = new ArrayList<>();
 

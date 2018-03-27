@@ -9,7 +9,7 @@ public class ModoFuerzaBruta {
 		int numThreads = Integer.parseInt(args[0]);
 		int ejecuciones = Integer.parseInt(args[1]);
 
-		ClaseAFB objA = new ClaseAFB(2, ejecuciones, numThreads);
+		ClaseAFB objA = new ClaseAFB(0, ejecuciones, numThreads);
 		ArrayList<Thread> misHilos = new ArrayList<>();
 		for (int i = 0; i < numThreads; i++) {
 			String nombreHilo = Integer.toString(i+1);
