@@ -1,5 +1,3 @@
-
-
 import java.util.ArrayList;
 
 public class MiProblema {
@@ -11,7 +9,7 @@ public class MiProblema {
 		int numThreads = Integer.parseInt(args[0]);
 		int ejecuciones = Integer.parseInt(args[1]);
 
-		ClaseA objA = new ClaseA(10, ejecuciones);
+		ClaseA objA = new ClaseA(2, ejecuciones, numThreads);
 		ArrayList<Thread> misHilos = new ArrayList<>();
 		for (int i = 0; i < numThreads; i++) {
 			String nombreHilo = Integer.toString(i+1);
@@ -37,16 +35,20 @@ public class MiProblema {
 class ClaseA {
 	private int espera;
 	public int nActual;
-	public int nHUltimo;
+	public int nSiguiente;
+	public int numThreads;
 
-	public ClaseA(int espera, int nActual) {
+	public ClaseA(int espera, int nActual, int numThreads) {
 		this.espera = espera;
 		this.nActual = nActual;
+		this.numThreads = numThreads;
+		this.nSiguiente = 1;
+		
 	}
 
 	public void EnterAndWait() {
 		try {
-			nHUltimo = Integer.parseInt(Thread.currentThread().getName());
+			nSiguiente = (Integer.parseInt(Thread.currentThread().getName())) % numThreads + 1;
 			System.out.println("Ejecutando hilo " + Thread.currentThread().getName());
 			Thread.sleep(espera);
 			System.out.println("Hilo " + Thread.currentThread().getName() + " acabando de ejecutarse. Quedan " + --nActual
@@ -69,7 +71,7 @@ class MiThread implements Runnable {
 	public void run() {
 		synchronized (objA) {
 			while (objA.nActual > 0) {
-				if (!Thread.currentThread().getName().equals(Integer.toString(objA.nHUltimo))) {
+				if (Thread.currentThread().getName().equals(Integer.toString(objA.nSiguiente))) {
 					objA.EnterAndWait();
 					objA.notifyAll();
 				}else {
