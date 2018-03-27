@@ -1,6 +1,5 @@
 package P3_b;
 
-
 import java.util.ArrayList;
 
 public class ModoFuerzaBruta {
@@ -12,13 +11,12 @@ public class ModoFuerzaBruta {
 		int numThreads = Integer.parseInt(args[0]);
 		int ejecuciones = Integer.parseInt(args[1]);
 
-		ClaseA_FB objA = new ClaseA_FB(2, ejecuciones);
+		ClaseAFB objA = new ClaseAFB(2, ejecuciones, numThreads);
 		ArrayList<Thread> misHilos = new ArrayList<>();
 		for (int i = 0; i < numThreads; i++) {
-			String nombreHilo = Integer.toString(i + 1);
-			misHilos.add(new Thread(new MiThread_FB(objA), nombreHilo));
+			String nombreHilo = Integer.toString(i+1);
+			misHilos.add(new Thread(new MiThreadFB(objA), nombreHilo));
 		}
-
 		long startTime = System.currentTimeMillis();
 		for (Thread thread : misHilos) {
 			thread.start();
@@ -36,31 +34,35 @@ public class ModoFuerzaBruta {
 
 }
 
-class ClaseA_FB {
+class ClaseAFB {
 	private int espera;
 	public int nActual;
-	public int nHUltimo;
+	public int nSiguiente;
+	public int numThreads;
 
-	public ClaseA_FB(int espera, int nActual) {
+	public ClaseAFB(int espera, int nActual, int numThreads) {
 		this.espera = espera;
 		this.nActual = nActual;
+		this.numThreads = numThreads;
+		this.nSiguiente = 1;
+		
 	}
 
 	public void EnterAndWait() {
 		try {
-			nHUltimo = Integer.parseInt(Thread.currentThread().getName());
+			nSiguiente = (Integer.parseInt(Thread.currentThread().getName())) % numThreads + 1;
 			Thread.sleep(espera);
-			--nActual;
+		 --nActual;
 		} catch (InterruptedException e) {
 		}
 	}
 }
 
-class MiThread_FB implements Runnable {
+class MiThreadFB implements Runnable {
 
-	ClaseA_FB objA;
+	ClaseAFB objA;
 
-	public MiThread_FB(ClaseA_FB objA) {
+	public MiThreadFB(ClaseAFB objA) {
 		this.objA = objA;
 	}
 
@@ -68,10 +70,10 @@ class MiThread_FB implements Runnable {
 	public void run() {
 		synchronized (objA) {
 			while (objA.nActual > 0) {
-				if (!Thread.currentThread().getName().equals(Integer.toString(objA.nHUltimo))) {
+				if (Thread.currentThread().getName().equals(Integer.toString(objA.nSiguiente))) {
 					objA.EnterAndWait();
 					objA.notifyAll();
-				} else {
+				}else {
 					try {
 						objA.wait();
 					} catch (InterruptedException e) {
