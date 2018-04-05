@@ -18,7 +18,7 @@ public class MiProblema {
 		t2.start();
 
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(500);
 			t1.interrupt();
 			t2.interrupt();
 			t1.join();
@@ -39,21 +39,27 @@ class Buffer {
 	final Lock lock = new ReentrantLock();
 	final Condition notFull = lock.newCondition();
 	final Condition notEmpty = lock.newCondition();
+	private String ultimoHilo;
 
 	public Buffer(int capacidad) {
 		productos = new LinkedList<>();
 		this.capacidad = capacidad;
+		this.ultimoHilo = "";
+		for (int i = 0; i < capacidad/2; i++) {
+			this.productos.add(0);	
+		}
 	}
 
 	public void write(int a) {
 		lock.lock();
 		try {
-			while (productos.size() >= capacidad)
+			while (productos.size() >= capacidad || ultimoHilo.equals(Thread.currentThread().getName()))
 				try {
 					notFull.await();
 				} catch (InterruptedException e) {
 				}
 			productos.add(a);
+			ultimoHilo = Thread.currentThread().getName();
 			System.out.println(Thread.currentThread().getName() + " is writting, Product size is: " + productos.size());
 			notEmpty.signal();
 		} finally {
@@ -71,6 +77,7 @@ class Buffer {
 				}
 			}
 			productos.remove(0);
+			ultimoHilo =  Thread.currentThread().getName();
 			System.out.println(Thread.currentThread().getName() + " is reading, Product size is: " + productos.size());
 			notFull.signal();
 		} finally {
