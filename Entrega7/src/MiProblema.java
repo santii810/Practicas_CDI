@@ -1,0 +1,121 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class MiProblema {
+	static final int CAPACIDAD = 20;
+
+	public static void main(String args[]) {
+		Buffer buffer = new Buffer(10);
+		Productor productor = new Productor(buffer);
+		Consumidor consumidor = new Consumidor(buffer);
+
+		Thread t1 = new Thread(productor, "Productor");
+		Thread t2 = new Thread(consumidor, "Consumidor");
+		t1.start();
+		t2.start();
+
+		try {
+			Thread.sleep(2000);
+			t1.interrupt();
+			t2.interrupt();
+			t1.join();
+			t2.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Program of exercise P4 has terminated");
+
+	}
+
+}
+
+class Buffer {
+	private LinkedList<Integer> productos;
+	private int capacidad;
+	final Lock lock = new ReentrantLock();
+	final Condition notFull = lock.newCondition();
+	final Condition notEmpty = lock.newCondition();
+
+	public Buffer(int capacidad) {
+		productos = new LinkedList<>();
+		this.capacidad = capacidad;
+	}
+
+	public void write(int a) {
+		lock.lock();
+		try {
+			while (productos.size() >= capacidad)
+				try {
+					notFull.await();
+				} catch (InterruptedException e) {
+				}
+			productos.add(a);
+			System.out.println(Thread.currentThread().getName() + " is writting, Product size is: " + productos.size());
+			notEmpty.signal();
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	public void read() {
+		lock.lock();
+		try {
+			while (productos.size() <= 0) {
+				try {
+					notEmpty.await();
+				} catch (InterruptedException e) {
+				}
+			}
+			productos.remove(0);
+			System.out.println(Thread.currentThread().getName() + " is reading, Product size is: " + productos.size());
+			notFull.signal();
+		} finally {
+			lock.unlock();
+		}
+	}
+}
+
+class Productor implements Runnable {
+
+	Buffer buffer;
+
+	public Productor(Buffer buffer) {
+		this.buffer = buffer;
+	}
+
+	@Override
+	public void run() {
+		while (true)
+			try {
+				Thread.sleep((long) (Math.random() * 5));
+				buffer.write(3);
+			} catch (InterruptedException e) {
+				break;
+			}
+	}
+}
+
+class Consumidor implements Runnable {
+
+	Buffer buffer;
+
+	public Consumidor(Buffer buffer) {
+		this.buffer = buffer;
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			try {
+				Thread.sleep((long) (Math.random() * 5));
+				buffer.read();
+			} catch (InterruptedException e) {
+				break;
+			}
+		}
+	}
+}
