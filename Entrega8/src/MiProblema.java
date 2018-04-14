@@ -1,105 +1,67 @@
-import java.util.LinkedList;
-import java.util.concurrent.Semaphore;
+import java.util.Random;
 
 public class MiProblema {
-	static final int CAPACIDAD = 20;
-
-	public static void main(String args[]) {
-		Buffer buffer = new Buffer(10);
-		Productor productor = new Productor(buffer);
-		Consumidor consumidor = new Consumidor(buffer);
-
-		Thread t1 = new Thread(productor, "Productor");
-		Thread t2 = new Thread(consumidor, "Consumidor");
-		t1.start();
-		t2.start();
-
-		try {
-			Thread.sleep(500);
-			t1.interrupt();
-			t2.interrupt();
-			t1.join();
-			t2.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		System.out.println("Program of exercise P4 has terminated");
-
-	}
 
 }
 
-class Buffer {
-	private LinkedList<Integer> productos;
-	private int capacidad;
-	final Semaphore writer = new Semaphore(1);
-	final Semaphore reader = new Semaphore(0);
+class Matrix {
+	int dim;
+	double[][] data;
+	int rowDisplace, colDisplace;
 
-	public Buffer(int capacidad) {
-		productos = new LinkedList<>();
-		this.capacidad = capacidad;
+	public Matrix(int d) {
+		dim = d;
+		rowDisplace = colDisplace = 0;
+		data = new double[d][d];
 	}
 
-	public void write(int a) {
-		try {
-			writer.acquire();
-		productos.add(a);
-		System.out.println(Thread.currentThread().getName() + " is writting, Product size is: " + productos.size());
-		reader.release();
-		} catch (InterruptedException e) {
-		}
+	private Matrix(double[][] matrix, int x, int y, int d) {
+		data = matrix;
+		rowDisplace = x;
+		colDisplace = y;
+		dim = d;
 	}
 
-	public void read() {
-		try {
-			reader.acquire();
-		productos.remove(0);
-		System.out.println(Thread.currentThread().getName() + " is reading, Product size is: " + productos.size());
-		writer.release();
-		} catch (InterruptedException e) {
-		}
-	}
-}
-
-class Productor implements Runnable {
-
-	Buffer buffer;
-
-	public Productor(Buffer buffer) {
-		this.buffer = buffer;
-	}
-
-	@Override
-	public void run() {
-		while (true)
-			try {
-				Thread.sleep((long) (Math.random() * 5));
-				buffer.write(3);
-			} catch (InterruptedException e) {
-				break;
-			}
-	}
-}
-
-class Consumidor implements Runnable {
-
-	Buffer buffer;
-
-	public Consumidor(Buffer buffer) {
-		this.buffer = buffer;
-	}
-
-	@Override
-	public void run() {
-		while (true) {
-			try {
-				Thread.sleep((long) (Math.random() * 5));
-				buffer.read();
-			} catch (InterruptedException e) {
-				break;
+	public void initialize() {
+		Random rand = new Random();
+		for (int i = 0; i < dim; i++) {
+			for (int j = 0; j < dim; j++) {
+				data[i][j] = (double) rand.nextInt(10);
 			}
 		}
 	}
+
+	public double get(int row, int col) {
+		return data[row + rowDisplace][col + colDisplace];
+	}
+
+	public void set(int row, int col, double value) {
+		data[row + rowDisplace][col + colDisplace] = value;
+	}
+
+	public int getDim() {
+		return dim;
+	}
+
+	public Matrix[][] split() {
+		Matrix[][] result = new Matrix[2][2];
+		int newDim = dim / 2;
+		result[0][0] = new Matrix(data, rowDisplace, colDisplace, newDim);
+		result[0][1] = new Matrix(data, rowDisplace, colDisplace + newDim, newDim);
+		result[1][0] = new Matrix(data, rowDisplace + newDim, colDisplace, newDim);
+		result[1][1] = new Matrix(data, rowDisplace + newDim, colDisplace + newDim, newDim);
+		return result;
+	}
+
+	public String toString() {
+		String ret = "";
+		for (int i = 0; i < dim; i++) {
+			for (int j = 0; j < dim; j++) {
+				ret += data[i][j] + " ";
+			}
+			ret += "\n";
+		}
+		return ret;
+	}
+
 }
-	
