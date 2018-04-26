@@ -33,7 +33,6 @@ class Server extends Thread {
 			while (true) {
 				socket = server.accept();
 				ois = new ObjectInputStream(socket.getInputStream());
-				// Recivir mensaje
 				Mensaje message = (Mensaje) ois.readObject();
 				System.out.println("Server Received: ");
 				message.imprimir();
@@ -41,21 +40,22 @@ class Server extends Thread {
 				switch (message.id) {
 				case Mensaje.MSG_GET_FRAGMENT:
 					oos = new ObjectOutputStream(socket.getOutputStream());
-					oos.writeObject(sendFragment()); // mando un fragmento
+					oos.writeObject(sendFragment()); 
 					break;
 				case Mensaje.MSG_SET_FRAGMENT:
 					matriz.guardarFragmento(message.fragmento);
 					oos = new ObjectOutputStream(socket.getOutputStream());
-					oos.writeObject(sendFragment()); // mando un fragmento
+					oos.writeObject(sendFragment()); 
 					break;
 				default:
 					System.out.println("Mensaje no entendido por el servidor");
 					break;
 				}
 
-				// Enviar mensaje
-				oos = new ObjectOutputStream(socket.getOutputStream());
-				oos.writeObject(sendFragment()); // mando un fragmento
+				ois = new ObjectInputStream(socket.getInputStream());
+				message = (Mensaje) ois.readObject();
+				System.out.println("Server Received: ");
+				message.imprimir();
 
 				ois.close();
 				oos.close();
@@ -106,11 +106,10 @@ class Client extends Thread {
 
 				switch (message.id) {
 				case Mensaje.MSG_FILTRAR:
-					// si recibo un fragmento que filtrar lo filtro y lo devuelvo
 					message.fragmento.filtroMediano();
 					oos = new ObjectOutputStream(socket.getOutputStream());
 					oos.writeObject(new Mensaje(Mensaje.MSG_SET_FRAGMENT, message.fragmento));
-					System.out.println("filtrando mensaje");
+					System.out.println("filtrado mensaje");
 					break;
 				case Mensaje.MSG_IMG_COMPLETE:
 					completo = true;
@@ -272,10 +271,14 @@ class Mensaje implements Serializable {
 
 	// El servidor le manda al cliente el mensaje imagen completa para que pare
 	public static final int MSG_IMG_COMPLETE = 10;
-	public static final int MSG_FILTRAR = 11; // El servidor le manda al cliente un fragmento para filtrar
+	// El servidor le manda al cliente un fragmento para filtrar
+	public static final int MSG_FILTRAR = 11; 
 
-	public static final int MSG_GET_FRAGMENT = 20; // El cliente le manda al servidor una peticion de trabajo
-	public static final int MSG_SET_FRAGMENT = 21; // El cliente devuelve el fragmento filtrado
+	
+	// El cliente le manda al servidor una peticion de trabajo
+	public static final int MSG_GET_FRAGMENT = 20; 
+	// El cliente devuelve el fragmento filtrado
+	public static final int MSG_SET_FRAGMENT = 21; 
 
 	public int id;
 	public MiFragmento fragmento;
