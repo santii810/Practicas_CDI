@@ -25,12 +25,13 @@ class Server extends Thread {
 	ObjectInputStream ois = null;
 	ObjectOutputStream oos = null;
 	MiMatriz matriz;
+	boolean acabado = false;
 
 	public void run() {
 		matriz = new MiMatriz();
 		try {
 			ServerSocket server = new ServerSocket(4444);
-			while (true) {
+			while (!acabado) {
 				socket = server.accept();
 				ois = new ObjectInputStream(socket.getInputStream());
 				Mensaje message = (Mensaje) ois.readObject();
@@ -40,23 +41,25 @@ class Server extends Thread {
 				switch (message.id) {
 				case Mensaje.MSG_GET_FRAGMENT:
 					oos = new ObjectOutputStream(socket.getOutputStream());
-					oos.writeObject(sendFragment()); 
+					oos.writeObject(sendFragment());
 					break;
-				case Mensaje.MSG_SET_FRAGMENT:
-					matriz.guardarFragmento(message.fragmento);
-					oos = new ObjectOutputStream(socket.getOutputStream());
-					oos.writeObject(sendFragment()); 
-					break;
+
 				default:
 					System.out.println("Mensaje no entendido por el servidor");
 					break;
 				}
-
 				ois = new ObjectInputStream(socket.getInputStream());
 				message = (Mensaje) ois.readObject();
-				System.out.println("Server Received: ");
+				System.out.println("Server Received 2: ");
 				message.imprimir();
+				if (message.id == Mensaje.MSG_SET_FRAGMENT) {
+					matriz.guardarFragmento(message.fragmento);
+					matriz.imprimirDestino();
+				}
 
+				if (matriz.fragmentosReconstruidos == Math.pow(MiMatriz.NUM_DIVISIONES, 2)) {
+					acabado = true;
+				}
 				ois.close();
 				oos.close();
 				socket.close();
@@ -118,9 +121,9 @@ class Client extends Thread {
 					System.out.println("Mensaje no entendido por el cliente");
 					break;
 				}
-			ois.close();
-			oos.close();
-			socket.close();
+				ois.close();
+				oos.close();
+				socket.close();
 			}
 		} catch (Exception e) {
 		}
@@ -128,11 +131,12 @@ class Client extends Thread {
 }
 
 class MiMatriz {
-	private static final int NUM_DIVISIONES = 4;
+	public static final int NUM_DIVISIONES = 4;
 	private static final String INPUT = "monkey.png";
 	static BufferedImage img;
 	static int[][] original;
 	static int[][] destino;
+	public static int fragmentosReconstruidos = 0;
 	Queue<MiFragmento> fragmentos;
 
 	public MiMatriz() {
@@ -141,16 +145,18 @@ class MiMatriz {
 		dividirMatriz();
 	}
 
-	public void guardarFragmento(MiFragmento fragmento) {
-		int col = fragmento.colInicio;
-		int fil = fragmento.filaInicio;
-		for (int i = 0; i < fragmento.fragmento.length; i++) {
-			for (int j = 0; j < fragmento.fragmento.length; j++) {
-				destino[fil][col++] = fragmento.fragmento[i][j];
+	public void guardarFragmento(MiFragmento f) {
+		int col = f.colInicio;
+		int fil = f.filaInicio;
+		System.out.println("col" + col + " fil" + fil + " len" + f.fragmento.length);
+		for (int i = 0; i < f.fragmento.length; i++) {
+			for (int j = 0; j < f.fragmento.length; j++) {
+				destino[fil][col++] = f.fragmento[i][j];
 			}
 			fil++;
+			col = f.colInicio;
 		}
-
+		fragmentosReconstruidos++;
 	}
 
 	private void dividirMatriz() {
@@ -183,6 +189,7 @@ class MiMatriz {
 			final int width = img.getWidth();
 			final int height = img.getHeight();
 			original = new int[width][height];
+			destino = new int[width][height];
 
 			Raster raster_in = img.getData();
 			for (int i = 0; i < width; i++) {
@@ -210,6 +217,17 @@ class MiMatriz {
 			}
 			System.out.println();
 		}
+	}
+
+	public void imprimirDestino() {
+		System.out.println("Matriz origen");
+		for (int i = 0; i < destino.length; i++) {
+			for (int j = 0; j < destino.length; j++) {
+				System.out.print(destino[i][j] + "\t");
+			}
+			System.out.println();
+		}
+
 	}
 
 }
@@ -272,13 +290,12 @@ class Mensaje implements Serializable {
 	// El servidor le manda al cliente el mensaje imagen completa para que pare
 	public static final int MSG_IMG_COMPLETE = 10;
 	// El servidor le manda al cliente un fragmento para filtrar
-	public static final int MSG_FILTRAR = 11; 
+	public static final int MSG_FILTRAR = 11;
 
-	
 	// El cliente le manda al servidor una peticion de trabajo
-	public static final int MSG_GET_FRAGMENT = 20; 
+	public static final int MSG_GET_FRAGMENT = 20;
 	// El cliente devuelve el fragmento filtrado
-	public static final int MSG_SET_FRAGMENT = 21; 
+	public static final int MSG_SET_FRAGMENT = 21;
 
 	public int id;
 	public MiFragmento fragmento;
@@ -294,7 +311,7 @@ class Mensaje implements Serializable {
 
 	public void imprimir() {
 		System.out.println(id);
-		if (id == MSG_FILTRAR) {
+		if (id == MSG_FILTRAR || id == MSG_SET_FRAGMENT) {
 			fragmento.imprimir();
 		}
 		System.out.println();
