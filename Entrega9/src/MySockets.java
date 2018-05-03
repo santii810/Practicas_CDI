@@ -19,8 +19,6 @@ public class MySockets {
 		new Server().start();
 		new Client().start();
 		new Client().start();
-		
-
 		System.out.println("Program of exercise P3 has terminated");
 	}
 }
@@ -40,8 +38,8 @@ class Server extends Thread {
 				socket = server.accept();
 				ois = new ObjectInputStream(socket.getInputStream());
 				Mensaje message = (Mensaje) ois.readObject();
-				System.out.println("Server Received: ");
-				message.imprimir();
+//				System.out.println("Server Received: ");
+//				message.imprimir();
 
 				if (message.id == Mensaje.MSG_GET_FRAGMENT) {
 					oos = new ObjectOutputStream(socket.getOutputStream());
@@ -49,24 +47,22 @@ class Server extends Thread {
 				}
 				ois = new ObjectInputStream(socket.getInputStream());
 				message = (Mensaje) ois.readObject();
-				System.out.println("Server Received 2: ");
-				message.imprimir();
+//				System.out.println("Server Received 2: ");
+//				message.imprimir();
 				if (message.id == Mensaje.MSG_SET_FRAGMENT) {
 					matriz.guardarFragmento(message.fragmento);
-					matriz.imprimirDestino();
-					System.out.println("Fragmentos reconstruidos " + matriz.fragmentosReconstruidos);
+//					matriz.imprimirDestino();
+//					System.out.println("Fragmentos reconstruidos " + matriz.fragmentosReconstruidos);
 				}
 
 				if (matriz.fragmentosReconstruidos == Math.pow(MiMatriz.NUM_DIVISIONES, 2)) {
 					acabado = true;
-					MiMatriz.escribirImagen();
+//					MiMatriz.escribirImagen();
 				}
 				ois.close();
 				oos.close();
 				socket.close();
 			}
-
-			System.out.println("Fin servidor");
 		} catch (Exception e) {
 		}
 	}
@@ -106,16 +102,15 @@ class Client extends Thread {
 
 				// Recibir mensaje
 				ois = new ObjectInputStream(socket.getInputStream());
-				System.out.println("Client recived: ");
 				Mensaje message = (Mensaje) ois.readObject();
-				message.imprimir();
+//				System.out.println("Client recived: ");
+//				message.imprimir();
 
 				switch (message.id) {
 				case Mensaje.MSG_FILTRAR:
 					message.fragmento.filtroMediano();
 					oos = new ObjectOutputStream(socket.getOutputStream());
 					oos.writeObject(new Mensaje(Mensaje.MSG_SET_FRAGMENT, message.fragmento));
-					System.out.println("filtrado mensaje");
 					break;
 				case Mensaje.MSG_IMG_COMPLETE:
 					completo = true;
@@ -151,7 +146,6 @@ class MiMatriz {
 	public void guardarFragmento(MiFragmento f) {
 		int col = f.colInicio;
 		int fil = f.filaInicio;
-		System.out.println("col" + col + " fil" + fil + " len" + f.fragmento.length);
 		for (int i = 0; i < f.fragmento.length; i++) {
 			for (int j = 0; j < f.fragmento.length; j++) {
 				destino[fil][col++] = f.fragmento[i][j];
