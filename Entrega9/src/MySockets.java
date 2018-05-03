@@ -1,6 +1,8 @@
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.File;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -16,6 +18,9 @@ public class MySockets {
 	public static void main(String args[]) {
 		new Server().start();
 		new Client().start();
+		new Client().start();
+		
+
 		System.out.println("Program of exercise P3 has terminated");
 	}
 }
@@ -38,15 +43,9 @@ class Server extends Thread {
 				System.out.println("Server Received: ");
 				message.imprimir();
 
-				switch (message.id) {
-				case Mensaje.MSG_GET_FRAGMENT:
+				if (message.id == Mensaje.MSG_GET_FRAGMENT) {
 					oos = new ObjectOutputStream(socket.getOutputStream());
 					oos.writeObject(sendFragment());
-					break;
-
-				default:
-					System.out.println("Mensaje no entendido por el servidor");
-					break;
 				}
 				ois = new ObjectInputStream(socket.getInputStream());
 				message = (Mensaje) ois.readObject();
@@ -55,15 +54,19 @@ class Server extends Thread {
 				if (message.id == Mensaje.MSG_SET_FRAGMENT) {
 					matriz.guardarFragmento(message.fragmento);
 					matriz.imprimirDestino();
+					System.out.println("Fragmentos reconstruidos " + matriz.fragmentosReconstruidos);
 				}
 
 				if (matriz.fragmentosReconstruidos == Math.pow(MiMatriz.NUM_DIVISIONES, 2)) {
 					acabado = true;
+					MiMatriz.escribirImagen();
 				}
 				ois.close();
 				oos.close();
 				socket.close();
 			}
+
+			System.out.println("Fin servidor");
 		} catch (Exception e) {
 		}
 	}
@@ -132,7 +135,7 @@ class Client extends Thread {
 
 class MiMatriz {
 	public static final int NUM_DIVISIONES = 4;
-	private static final String INPUT = "monkey.png";
+	private static final String INPUT = "bigmonkey.png";
 	static BufferedImage img;
 	static int[][] original;
 	static int[][] destino;
@@ -201,6 +204,24 @@ class MiMatriz {
 
 		} catch (Exception e) {
 			System.out.println("Error leyendo imagen");
+		}
+
+	}
+
+	public static void escribirImagen() {
+		final int width = img.getWidth();
+		final int height = img.getHeight();
+		WritableRaster raster_out = img.getRaster();
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				raster_out.setSample(i, j, 0, destino[i][j] / 2);
+			}
+		}
+		img.setData(raster_out);
+		File file_out = new File("out.png");
+		try {
+			ImageIO.write(img, "png", file_out);
+		} catch (IOException ex) {
 		}
 
 	}
